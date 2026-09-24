@@ -1,3 +1,7 @@
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 import time
 import torch
 import torch.nn as nn
@@ -51,7 +55,6 @@ def run_benchmark(warmup: int = 10, iterations: int = 50):
             out = aiotech(q, docs, graph, c)
     t_aio = (time.perf_counter() - t0) * 1000.0 / iterations
 
-    # Extraction sécurisée des scalaires (sans appel .item() sur des types float natifs)
     allocated_tokens = float(out["allocated_tokens"])
     memory_ratio = float(out["allocated_memory_ratio"])
     token_economy = max(0.0, (1.0 - (allocated_tokens / seq_len)) * 100.0)
