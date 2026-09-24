@@ -233,8 +233,7 @@ Apache 2.0 — Libre d'usage dans contextes commerciaux et académiques.
 
 ## 👥 Contributeurs
 
-- Architecture & design : AIOTECH Research Team
-- Implémentation & benchmarks : Claude (Anthropic)
+- Architecture & design : Alban
 
 ---
 
