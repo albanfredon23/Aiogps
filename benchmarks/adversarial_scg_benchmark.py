@@ -1,3 +1,7 @@
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 import torch
 import numpy as np
 from core.aiotech44_core import AIOTECH44_EnergyCore
@@ -13,19 +17,12 @@ def run_adversarial_scg_test():
     batch_size = 4
     beam_width = 4
 
-    # Calibrage corrigé : lambda = 1.0, seuil de violation à 0.1 (rejette si dot < -0.1)
     pruner = SCGEnergyPruner(lam=1.0, energy_threshold=0.1)
     pruner.eval()
 
-    # Définition d'un vecteur de contrainte de référence
     constraints = torch.randn(batch_size, emb_dim)
     constraints = torch.nn.functional.normalize(constraints, p=2, dim=-1)
 
-    # 4 faisceaux de test par batch :
-    # 0: Alignée (dot ≈ +1.0) -> Valide
-    # 1: Neutre/Orthogonale (dot ≈ 0.0) -> Tolérée
-    # 2: Déviante légère (dot ≈ -0.3) -> Non admissible
-    # 3: Directement opposée (dot ≈ -1.0) -> Violation critique
     c_exp = constraints.unsqueeze(1)
     noise = torch.randn(batch_size, beam_width, emb_dim) * 0.05
 
@@ -40,8 +37,7 @@ def run_adversarial_scg_test():
     with torch.no_grad():
         surviving, active_mask, _ = pruner(trajectories, constraints)
 
-    # Analyse des résultats
-    print(f"\nProfil des 4 trajectoires testées par échantillon :")
+    print("\nProfil des 4 trajectoires testées par échantillon :")
     labels = ["Alignée (+1.0)", "Orthogonale (0.0)", "Déviante (-0.3)", "Opposée (-1.0)"]
     retention_per_type = active_mask.mean(dim=0).numpy()
 
