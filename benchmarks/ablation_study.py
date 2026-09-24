@@ -1,3 +1,7 @@
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 import time
 from typing import Dict, Any
 import numpy as np
@@ -30,7 +34,7 @@ class AIOTECHWithoutSCG(AIOTECH44_EnergyCore):
         gated_nodes, complexity_score = self.adaptive_gate(query_emb, graph_nodes)
         trajectories, _ = self.beam_planner(gated_nodes)
 
-        # Bypass SCG : aucune pénalité ni élagage, masque unitaire
+        # Bypass SCG
         surviving_trajectories = trajectories
         active_mask = torch.ones(trajectories.shape[:2], device=trajectories.device)
         scg_loss = torch.tensor(0.0, device=trajectories.device)
@@ -75,11 +79,9 @@ def run_ablation(iterations: int = 100, warmup: int = 15):
     for m in models.values():
         m.eval()
 
-    # Jeux d'entrée synthétiques avec contraintes adverses injectées
     q = torch.randn(batch_size, emb_dim, device=device)
     docs = torch.randn(batch_size, seq_len, emb_dim, device=device)
     graph = torch.randn(batch_size, num_nodes, emb_dim, device=device)
-    # Contraintes polarisées pour induire des violations partielles mesurables
     c = torch.randn(batch_size, emb_dim, device=device)
 
     # Phase de chauffe
@@ -108,7 +110,6 @@ def run_ablation(iterations: int = 100, warmup: int = 15):
                     out = model(q, docs, graph, c)
                     dt_ms = (time.perf_counter() - t0) * 1000.0
                     tok = float(out["allocated_tokens"])
-                    # Taux de trajectoires invalidées (actives < 0.5)
                     active = (out["trajectories"].abs().sum(dim=-1) > 1e-5).float()
                     pruned = float((1.0 - active.mean()) * 100.0)
 
@@ -124,7 +125,6 @@ def run_ablation(iterations: int = 100, warmup: int = 15):
             "pruned_trajectories": float(np.mean(pruned_ratios))
         }
 
-    # Restitution tabulaire
     print("\n" + "=" * 90)
     print(" RÉSULTATS COMPARATIFS DE L'ÉTUDE D'ABLATION (ISOLATION SCG)")
     print("=" * 90)
@@ -139,16 +139,6 @@ def run_ablation(iterations: int = 100, warmup: int = 15):
         print(f"{name:<25} | {lat:<16} | {tok:<15} | {ret:<12} | {prun:<12}")
 
     print("=" * 90)
-    
-    # Interprétation différentielle
-    delta_pruning = metrics["3. AIOTECH (Complet)"]["pruned_trajectories"]
-    lat_diff = (
-        (metrics["3. AIOTECH (Complet)"]["latency_mean"] - metrics["2. AIOTECH (Sans SCG)"]["latency_mean"])
-        / metrics["2. AIOTECH (Sans SCG)"]["latency_mean"] * 100.0
-    )
-    print(f"\n[Diagnostic SCG]")
-    print(f" • Taux d'élagage géométrique direct : {delta_pruning:.1f} % des trajectoires aberrantes éliminées.")
-    print(f" • Surcoût temporel du filtre SCG   : {lat_diff:+.1f} % par rapport à la version sans contraintes.")
 
 
 if __name__ == "__main__":
