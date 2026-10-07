@@ -3,6 +3,9 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python: 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.1+-ee4c2c.svg)](https://pytorch.org/)
+[![Site](https://img.shields.io/badge/site-albanfredon23.github.io%2FAiogps-34d399.svg)](https://albanfredon23.github.io/Aiogps/)
+
+🌐 **Site de présentation 3D : [albanfredon23.github.io/Aiogps](https://albanfredon23.github.io/Aiogps/)** (pipeline en scène Three.js, démo interactive, résultats mesurés ; sources dans [`site/`](site/)).
 
 **AIOTECH44** est un middleware cognitif conçu pour optimiser l'efficience énergétique des inférences de modèles de langage. Il remplace le calcul dense et systématique par une **exploration de trajectoires admissibles (TAP)**, un **élagage géométrique par contraintes sphériques (SCG)** et une **allocation de mémoire différentielle**.
 
