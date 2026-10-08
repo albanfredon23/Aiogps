@@ -176,12 +176,7 @@ Aiogps/
 └── site/                      # site de présentation 3D (Vite + Three.js)
 ```
 
-Le site est publié sur GitHub Pages par `.github/workflows/pages.yml` à chaque push sur `main` qui touche
-`site/` ; voir [`site/README.md`](site/README.md).
 
-## Licence
-
-Apache 2.0 : libre d'usage dans des contextes commerciaux et académiques, sans garantie.
 
 ## Auteur
 
